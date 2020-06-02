@@ -11,9 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * java -jar luxmsbi-excel-parser-4.0.jar <filename>
- */
 @Slf4j
 public class Main {
 

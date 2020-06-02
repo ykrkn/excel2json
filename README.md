@@ -11,3 +11,7 @@ Result file will be saved into the same path as the source and with the same fil
 ## run
 
 `java -jar build/libs/xl2json.jar source_file.xlsx`
+
+## requirements
+
+*JDK 8*

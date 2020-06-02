@@ -39,7 +39,7 @@ public class SheetParser {
     public void parse(ExcelParserCallback callback) {
         for(Row row : sheet) {
             if(skipHiddenRows && row.getZeroHeight()) {
-                log.warn("Row [" + sheet.getSheetName() + ':' + row.getRowNum() + "] is hidden - will be skipped");
+                log.warn("Row [" + row.getRowNum() + "] is hidden - will be skipped");
                 continue;
             }
 
@@ -49,7 +49,7 @@ public class SheetParser {
 
             for (Cell cell : row) {
                 if(skipHiddenCols && sheet.isColumnHidden(cell.getColumnIndex())) {
-                    log.debug("Column [" + sheet.getSheetName() + ':' + cell.getColumnIndex() + "] is hidden - will be skipped");
+                    log.debug("Column [" + cell.getColumnIndex() + "] is hidden - will be skipped");
                     continue;
                 }
 

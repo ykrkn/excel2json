@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.format.CellDateFormatter;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -13,16 +11,16 @@ import java.util.Date;
 public class SheetParser {
     
     public enum Options {
-        SKIP_HIDDEN_ROWS,
-        SKIP_HIDDEN_COLS,
+        PARSE_HIDDEN_ROWS,
+        PARSE_HIDDEN_COLS,
         DATE_FORMAT_FROM_CELL
     }
 
-    private boolean dateFormatFromCell = false;
+    private boolean dateFormatFromCell;
 
-    private boolean skipHiddenRows = false;
+    private boolean parseHiddenRows;
 
-    private boolean skipHiddenCols = false;
+    private boolean parseHiddenCols;
 
     private final Sheet sheet;
 
@@ -30,15 +28,15 @@ public class SheetParser {
         this.sheet = sheet;
         for (int i = 0; i < opts.length; i++) {
             Options opt = opts[i];
-            if (opt == Options.SKIP_HIDDEN_COLS) skipHiddenCols = true;
-            if (opt == Options.SKIP_HIDDEN_ROWS) skipHiddenRows = true;
+            if (opt == Options.PARSE_HIDDEN_COLS) parseHiddenCols = true;
+            if (opt == Options.PARSE_HIDDEN_ROWS) parseHiddenRows = true;
             if (opt == Options.DATE_FORMAT_FROM_CELL) dateFormatFromCell = true;
         }
     }
 
     public void parse(ExcelParserCallback callback) {
         for(Row row : sheet) {
-            if(skipHiddenRows && row.getZeroHeight()) {
+            if(!parseHiddenRows && row.getZeroHeight()) {
                 log.warn("Row [" + row.getRowNum() + "] is hidden - will be skipped");
                 continue;
             }
@@ -48,8 +46,8 @@ public class SheetParser {
             callback.onRowStart(row.getRowNum());
 
             for (Cell cell : row) {
-                if(skipHiddenCols && sheet.isColumnHidden(cell.getColumnIndex())) {
-                    log.debug("Column [" + cell.getColumnIndex() + "] is hidden - will be skipped");
+                if(!parseHiddenCols && sheet.isColumnHidden(cell.getColumnIndex())) {
+                    log.warn("Column [" + cell.getColumnIndex() + "] is hidden - will be skipped");
                     continue;
                 }
 
@@ -69,7 +67,7 @@ public class SheetParser {
         try {
             return getCellValue(cell, cell.getCellTypeEnum());
         } catch (RuntimeException e) {
-            log.error(e.getMessage() + ' ' + cellToString(cell, "UNKNOWN"));
+            log.warn(e.getMessage() + ' ' + cellToString(cell, "UNKNOWN"));
             return null;
         }
     }

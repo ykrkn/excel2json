@@ -5,16 +5,27 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Iterator;
 
 @Slf4j
 public class ExcelParser {
-    
+
+    private SheetParser.Options[] options = new SheetParser.Options[] {
+        SheetParser.Options.DATE_FORMAT_FROM_CELL
+    };
+
+    public ExcelParser(SheetParser.Options ... options) {
+        SheetParser.Options[] ol = Arrays.copyOf(this.options, this.options.length+options.length);
+        for (int i = 0; i < options.length; i++) {
+            ol[this.options.length+i] = options[i];
+        }
+        this.options = ol;
+    }
+
     public void parse(InputStream is, ExcelParserCallback callback) {
         try {
             Workbook workbook = WorkbookFactory.create(is);
@@ -34,11 +45,7 @@ public class ExcelParser {
             if(callback.shouldBreak()) break;
             log.info("Recognize sheet:{}", sheet.getSheetName());
 
-            SheetParser sheetParser = new SheetParser(sheet,
-                    SheetParser.Options.DATE_FORMAT_FROM_CELL,
-                    SheetParser.Options.SKIP_HIDDEN_COLS,
-                    SheetParser.Options.SKIP_HIDDEN_ROWS
-            );
+            SheetParser sheetParser = new SheetParser(sheet, options);
 
             callback.onSheet(sheet.getSheetName());
             sheetParser.parse(callback);

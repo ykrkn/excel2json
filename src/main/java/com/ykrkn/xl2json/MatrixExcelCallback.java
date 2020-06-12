@@ -8,13 +8,16 @@ public class MatrixExcelCallback implements ExcelParserCallback {
     private final String workbookName;
 
     private final List<SheetResult> sheets = new ArrayList<>();
+    
+    private final boolean parseEmptyRows;
 
     private String currentSheetName;
 
     private SheetMatrix currentSheet;
 
-    public MatrixExcelCallback(String workbookName) {
+    public MatrixExcelCallback(String workbookName, boolean parseEmptyRows) {
         this.workbookName = workbookName;
+        this.parseEmptyRows = parseEmptyRows;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class MatrixExcelCallback implements ExcelParserCallback {
 
     @Override
     public void onSheetComplete() {
-        sheets.add(new SheetResult(workbookName, currentSheetName, currentSheet));
+        sheets.add(new SheetResult(workbookName, currentSheetName, currentSheet, parseEmptyRows));
     }
 
     public List<SheetResult> getSheets() {
